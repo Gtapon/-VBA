@@ -1,0 +1,56 @@
+Sub SaveFiles()
+    Dim ChromeApp As Object
+    Dim ChromeTabs As Object
+    Dim ChromeTab As Object
+    Dim ChromeWindow As Object
+    Dim FileLink As Object
+    Dim FileName As String
+    
+    ' Chromeブラウザのインスタンスを取得
+    Set ChromeApp = CreateObject("Chrome.Application")
+    
+    ' Chromeウィンドウを開く
+    ChromeApp.Visible = True
+    
+    ' 新しいタブを開く
+    Set ChromeTabs = ChromeApp.Windows(1).Tabs
+    Set ChromeTab = ChromeTabs.Add()
+    
+    ' 指定したWEBページを開く
+    ChromeTab.URL = "https://example.com"
+    
+    ' ページの読み込み完了を待つ
+    Do While ChromeApp.Busy Or ChromeApp.ReadyState <> 4
+        DoEvents
+    Loop
+    
+    ' ファイルリンクを取得し、クリックして保存する
+    Set ChromeWindow = ChromeApp.Windows(1)
+    Set FileLink = ChromeWindow.Document.getElementById("file-link-id") ' ファイルリンクの要素IDを指定
+    
+    If Not FileLink Is Nothing Then
+        FileName = "保存するファイル名.xlsx" ' 保存するファイル名を指定
+        
+        ' ファイルを保存するダイアログを表示
+        FileLink.Click
+        Application.Wait (Now + TimeValue("0:00:02")) ' ダイアログが表示されるまでの待機時間を指定
+        
+        ' ファイルを保存する
+        SendKeys "%{S}"
+        Application.Wait (Now + TimeValue("0:00:02")) ' ダイアログが閉じるまでの待機時間を指定
+        SendKeys FileName
+        SendKeys "{ENTER}"
+        
+        ' ファイルが保存されるまで待つ
+        Do While ChromeApp.Busy Or ChromeApp.ReadyState <> 4
+            DoEvents
+        Loop
+    End If
+    
+    ' タブを閉じる
+    ChromeTab.Close
+    
+    ' Chromeアプリを終了する
+    ChromeApp.Quit
+    Set ChromeApp = Nothing
+End Sub

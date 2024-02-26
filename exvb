@@ -1,0 +1,6 @@
+javascript:(function() {
+  var link = document.createElement('a');
+  link.href = location.href;
+  link.download = prompt('ファイル名を入力してください');
+  link.click();
+})();
